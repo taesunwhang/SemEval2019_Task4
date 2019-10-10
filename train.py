@@ -97,7 +97,7 @@ class MetonymyModel(object):
 
       tqdm_batch_iterator = tqdm(range(train_data_len))
       for batch_idx in tqdm_batch_iterator:
-        time.sleep(0.1)
+        
         batch_data = self.processor.get_batch_data(batch_idx, self.hparams.train_batch_size, "train")
         batch_article_embeddings, batch_labels, batch_article_len = self._batch_data_to_device(batch_data)
 
@@ -105,7 +105,8 @@ class MetonymyModel(object):
         predictions = torch.argmax(logits, dim=-1)
         correct_preds = torch.sum(torch.eq(predictions.float(), batch_labels).int())
         loss = self.criterion(logits, batch_labels.long())
-
+        
+        self.optimizer.zero_grad()
         loss.backward()
         nn.utils.clip_grad_norm_(self.model.parameters(), self.hparams.max_gradient_norm)
         self.optimizer.step()
